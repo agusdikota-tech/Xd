@@ -99,8 +99,7 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          # 2. Descargar cross-tools de forma limpia (creando respaldo si falla)
-          print("Aviso: Omitiendo cross-tools externas pesadas, asegurando estructura de respaldo...")
+          # 2. Asegurar estructura de cross-tools de respaldo
           ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
           os.makedirs(ct_dir, exist_ok=True)
           cmake_file = os.path.join(ct_dir, "clang-msvc.cmake")
@@ -126,5 +125,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode build -- -DGEODE_TARGET_PLATFORM=win
+          geode build -- -DGEODE_TARGET_PLATFORM=win32
           
