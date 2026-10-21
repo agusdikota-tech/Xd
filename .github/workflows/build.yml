@@ -125,5 +125,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode build -- -DGEODE_TARGET_PLATFORM=windows
+          geode build --platform win
           
