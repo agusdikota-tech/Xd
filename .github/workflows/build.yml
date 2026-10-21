@@ -16,12 +16,53 @@ jobs:
           submodules: recursive
 
       - name: Setup Ninja & Python
-        run: sudo apt-get update && sudo apt-get install -y ninja-build python3-pip
+        run: sudo apt-get update && sudo apt-get install -y ninja-build python3
 
       - name: Install Geode CLI
         run: |
-          pip3 install geode-cli --user
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          python3 -c '
+          import urllib.request, json, os, stat, zipfile, tarfile
+          url = "https://api.github.com/repos/geode-sdk/cli/releases/latest"
+          req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+          with urllib.request.urlopen(req) as response:
+              data = json.loads(response.read().decode())
+          
+          download_url = None
+          asset_name = ""
+          for asset in data.get("assets", []):
+              name = asset["name"].lower()
+              if "linux" in name or "ubuntu" in name:
+                  download_url = asset["browser_download_url"]
+                  asset_name = asset["name"]
+                  break
+          
+          print(f"Descargando {asset_name} desde {download_url}")
+          urllib.request.urlretrieve(download_url, asset_name)
+          
+          if asset_name.endswith(".zip"):
+              with zipfile.ZipFile(asset_name, "r") as zip_ref:
+                  zip_ref.extractall(".")
+          elif asset_name.endswith(".tar.gz") or asset_name.endswith(".tgz"):
+              with tarfile.open(asset_name, "r:gz") as tar_ref:
+                  tar_ref.extractall(".")
+          
+          binary_path = None
+          for root, dirs, files in os.walk("."):
+              for file in files:
+                  if file == "geode" or file == "geode-cli":
+                      binary_path = os.path.join(root, file)
+                      break
+              if binary_path:
+                  break
+          
+          if binary_path and binary_path != "./geode":
+              os.rename(binary_path, "geode")
+          elif not binary_path and not asset_name.endswith((".zip", ".tar.gz", ".tgz")):
+              os.rename(asset_name, "geode")
+          
+          os.chmod("geode", stat.S_IXUSR | stat.S_IRUSR | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+          '
+          sudo mv geode /usr/local/bin/
 
       - name: Build Mod
         run: |
