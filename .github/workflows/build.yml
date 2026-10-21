@@ -28,10 +28,10 @@ jobs:
 
       - name: Install Geode CLI & Build
         run: |
-          echo "Instalando Geode CLI estable..."
+          echo "Instalando Geode CLI desde GitHub..."
           mkdir -p $HOME/.geode/bin
           
-          # Descargar una versión estable y directa del CLI para Linux
+          # Descargar ejecutable oficial directo de GitHub Releases
           curl -L https://github.com/geode-sdk/cli/releases/download/v3.3.0/geode-cli-linux -o $HOME/.geode/bin/geode
           
           chmod +x $HOME/.geode/bin/geode
