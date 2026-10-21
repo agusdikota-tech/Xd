@@ -66,5 +66,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode package build
+          geode build
           
