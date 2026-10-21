@@ -1,10 +1,31 @@
-{
-    "geode": "v5.11.2",
-    "gd": "2.2.144",
-    "id": "agusdikota.frame_assist",
-    "name": "Frame Assist",
-    "version": "v1.0.0",
-    "developer": "agusdikota",
-    "description": "Mod de asistencia de frames para Geometry Dash.",
-    "repository": "https://github.com/agusdikota-tech/Xd"
-}
+name: Build Mod (Android)
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: android32
+          sdk: nightly
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Mod Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frame-assist-android
+          path: "*.geode"
+          
