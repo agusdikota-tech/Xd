@@ -62,9 +62,10 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Show CLI Help
+      - name: Setup Geode Cross-Tools
         run: |
-          geode --help
+          mkdir -p /home/runner/.local/share/Geode
+          git clone --recursive https://github.com/geode-sdk/cross-tools /home/runner/.local/share/Geode/cross-tools
 
       - name: Build Mod
         run: |
