@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -24,10 +27,11 @@ jobs:
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r25c" >> $GITHUB_ENV
 
       - name: Install Geode CLI & Build
-        shell: bash
         run: |
           echo "Instalando Geode CLI..."
-          curl -sSL https://geode-sdk.org/install.sh | bash
+          mkdir -p $HOME/.geode/bin
+          curl -L https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux -o $HOME/.geode/bin/geode
+          chmod +x $HOME/.geode/bin/geode
           export PATH="$HOME/.geode/bin:$PATH"
           
           # Instalar SDK y compilar
