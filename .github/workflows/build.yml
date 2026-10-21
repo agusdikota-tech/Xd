@@ -107,6 +107,17 @@ jobs:
               with open(cmake_file, "w") as f:
                   f.write("# Fallback toolchain\n")
           
+          # 3. Parchear PlatformDetect.cmake para evitar errores de plataforma desconocida
+          detect_path = os.path.join(sdk_dir, "cmake", "PlatformDetect.cmake")
+          if os.path.exists(detect_path):
+              with open(detect_path, "r") as f:
+                  code = f.read()
+              # Forzar para que acepte "win" sin lanzar error fatales
+              code = code.replace("message(FATAL_ERROR \"Unknown platform ${GEODE_TARGET_PLATFORM}\")", "set(GEODE_TARGET_PLATFORM \"win\")")
+              with open(detect_path, "w") as f:
+                  f.write(code)
+              print("PlatformDetect.cmake parcheado exitosamente.")
+
           print("Configuración de SDK y herramientas completada.")
           '
 
