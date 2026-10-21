@@ -101,18 +101,26 @@ jobs:
 
       - name: Configure Geode Profile & Install Binaries
         run: |
-          # Inicializar la configuración del CLI creando un perfil por defecto de forma no interactiva con variables de entorno o un archivo dummy
-          mkdir -p ~/.config/geode
-          cat << 'EOF' > ~/.config/geode/config.json
-          {
-            "default-profile": "default",
-            "profiles": {
-              "default": {
-                "path": "/home/runner/work/Xd/Xd",
-                "sdk": "/home/runner/.local/share/Geode"
-              }
-            }
+          # Crear directamente el archivo de configuración con el formato exacto que el CLI de Geode lee internamente
+          python3 - << 'EOF'
+          import os, json
+          config_path = os.path.expanduser("~/.config/geode/config.json")
+          os.makedirs(os.path.dirname(config_path), exist_ok=True)
+          
+          # Estructura validada para el CLI moderno de Geode
+          config_data = {
+              "profiles": {
+                  "default": {
+                      "path": "/home/runner/work/Xd/Xd",
+                      "sdk": "/home/runner/.local/share/Geode"
+                  }
+              },
+              "active": "default"
           }
+          
+          with open(config_path, "w") as f:
+              json.dump(config_data, f, indent=4)
+          print("Configuración interna generada con éxito en:", config_path)
           EOF
           geode sdk install-binaries
 
