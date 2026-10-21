@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GEODE_SDK: /home/runner/.local/share/Geode
-      GEODE_TARGET_PLATFORM: win
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -122,6 +121,19 @@ jobs:
           with open(config_file, "w") as f:
               json.dump(data, f)
           print("Perfil de Geode configurado correctamente.")
+          '
+
+      - name: Inject Platform to CMakeLists
+        run: |
+          python3 -c '
+          cmake_path = "CMakeLists.txt"
+          if os.path.exists(cmake_path):
+              with open(cmake_path, "r") as f:
+                  content = f.read()
+              if "GEODE_TARGET_PLATFORM" not in content:
+                  with open(cmake_path, "w") as f:
+                      f.write("set(GEODE_TARGET_PLATFORM win)\n" + content)
+                  print("GEODE_TARGET_PLATFORM inyectado en CMakeLists.txt")
           '
 
       - name: Build Mod
