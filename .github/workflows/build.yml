@@ -31,7 +31,7 @@ jobs:
           asset_name = ""
           for asset in data.get("assets", []):
               name = asset["name"].lower()
-              if "linux" in name or "ubuntu" in name:
+              if "linux" in name and not "arm" in name and not "aarch64" in name:
                   download_url = asset["browser_download_url"]
                   asset_name = asset["name"]
                   break
