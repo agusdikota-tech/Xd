@@ -64,10 +64,33 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode Cross-Tools Fallback
+      - name: Setup Geode SDK & Cross-Tools
         run: |
-          mkdir -p /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk
-          touch /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk/clang-msvc.cmake
+          python3 -c '
+          import urllib.request, zipfile, os, shutil
+          sdk_dir = "/home/runner/.local/share/Geode"
+          os.makedirs(sdk_dir, exist_ok=True)
+          
+          # Descargar SDK oficial
+          print("Descargando Geode SDK...")
+          sdk_url = "https://github.com/geode-sdk/geode/archive/refs/heads/main.zip"
+          urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
+          with zipfile.ZipFile("geode-sdk.zip", "r") as z:
+              z.extractall(sdk_dir)
+          extracted_name = [d for d in os.listdir(sdk_dir) if "geode-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
+          extracted_path = os.path.join(sdk_dir, extracted_name)
+          
+          # Mover contenido del SDK a la raíz de Geode
+          for item in os.listdir(extracted_path):
+              s = os.path.join(extracted_path, item)
+              d = os.path.join(sdk_dir, item)
+              if os.path.exists(d):
+                  if os.path.isdir(d): shutil.rmtree(d)
+                  else: os.remove(d)
+              shutil.move(s, d)
+          shutil.rmtree(extracted_path)
+          print("Geode SDK configurado correctamente.")
+          '
 
       - name: Configure Geode Profile
         run: |
@@ -84,6 +107,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          echo "GEODE_SDK=/home/runner/.local/share/Geode" >> $GITHUB_ENV
           geode build
           
