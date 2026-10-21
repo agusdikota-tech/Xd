@@ -1,44 +1,10 @@
-name: Build Mod (Android)
-
-on:
-  push:
-    branches: ["main", "master"]
-  pull_request:
-    branches: ["main", "master"]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Update Geode version in mod.json
-        run: |
-          python3 -c '
-          import json, os
-          if os.path.exists("mod.json"):
-              with open("mod.json", "r") as f:
-                  data = json.load(f)
-              data["geode"] = "v5.11.2"
-              with open("mod.json", "w") as f:
-                  json.dump(data, f, indent=4)
-              print("mod.json actualizado a v5.11.2")
-          '
-
-      - name: Build Geode Mod
-        uses: geode-sdk/build-geode-mod@main
-        with:
-          platform: android32
-          sdk: nightly
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Mod Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frame-assist-android
-          path: "*.geode"
-          
+{
+    "geode": "v5.11.2",
+    "gd": "2.2.144",
+    "id": "agusdikota.frame_assist",
+    "name": "Frame Assist",
+    "version": "v1.0.0",
+    "developer": "agusdikota",
+    "description": "Mod de asistencia de frames para Geometry Dash.",
+    "repository": "https://github.com/agusdikota-tech/Xd"
+}
