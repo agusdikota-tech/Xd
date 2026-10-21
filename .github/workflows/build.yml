@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GEODE_SDK: /home/runner/.local/share/Geode
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -82,5 +84,6 @@ jobs:
 
       - name: Build Mod
         run: |
+          echo "GEODE_SDK=/home/runner/.local/share/Geode" >> $GITHUB_ENV
           geode build
           
