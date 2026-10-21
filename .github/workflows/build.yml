@@ -139,10 +139,10 @@ jobs:
           config_file = os.path.join(config_dir, "config.json")
           data = {"sdk": "/home/runner/.local/share/Geode"}
           with open(config_file, "w") as f:
-              json.dump(data, f)
+              json.dumps(data, f)
           '
 
       - name: Build Mod
         run: |
-          geode build
+          geode build -- -DGEODE_TARGET_PLATFORM=win
           
