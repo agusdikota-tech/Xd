@@ -27,6 +27,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Download Geode SDK
+        run: |
+          git clone --branch v5.11.2 --depth 1 https://github.com/geode-sdk/geode.git $HOME/.local/share/Geode
+
       - name: Download & Setup Android NDK r25c
         run: |
           echo "Descargando NDK r25c..."
@@ -41,6 +45,8 @@ jobs:
             -DANDROID_ABI=${{ matrix.abi }} \
             -DANDROID_PLATFORM=${{ matrix.platform }} \
             -DCMAKE_BUILD_TYPE=Release
+        env:
+          GEODE_SDK: /home/runner/.local/share/Geode
 
       - name: Build Mod (${{ matrix.name }})
         run: cmake --build build_${{ matrix.name }} --config Release
