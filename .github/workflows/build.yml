@@ -10,11 +10,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Setup Geode CLI
-        uses: geode-sdk/setup-geode-cli@v1
+      - name: Setup Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Geode CLI
+        run: |
+          wget https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux.zip
+          unzip geode-cli-linux.zip
+          sudo chmod +x geode
+          sudo mv geode /usr/local/bin/
 
       - name: Build Mod
-        uses: geode-sdk/build-geode-mod@v1
-        
+        run: |
+          geode package build
+          
