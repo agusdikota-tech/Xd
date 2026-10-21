@@ -17,8 +17,8 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Ninja & Python & Clang
-        run: sudo apt-get update && sudo apt-get install -y ninja-build python3 clang lld
+      - name: Setup Ninja & Python & Clang/LLD
+        run: sudo apt-get update && sudo apt-get install -y ninja-build python3 clang lld llvm
 
       - name: Install Geode CLI
         run: |
@@ -64,14 +64,14 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode SDK & Valid Toolchain
+      - name: Setup Geode SDK
         run: |
           python3 -c '
           import urllib.request, zipfile, os, shutil
           sdk_dir = "/home/runner/.local/share/Geode"
           os.makedirs(sdk_dir, exist_ok=True)
           
-          # 1. Descargar Geode SDK probando ramas
+          # Descargar Geode SDK probando ramas (el SDK ya trae su toolchain oficial integrado)
           sdk_success = False
           for branch in ["main", "master"]:
               sdk_url = f"https://github.com/geode-sdk/geode/archive/refs/heads/{branch}.zip"
@@ -99,28 +99,7 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          # 2. Crear toolchain clang-msvc funcional para 32-bit Windows
-          ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
-          os.makedirs(ct_dir, exist_ok=True)
-          cmake_file = os.path.join(ct_dir, "clang-msvc.cmake")
-          
-          toolchain_content = """
-          set(CMAKE_SYSTEM_NAME Windows)
-          set(CMAKE_SYSTEM_PROCESSOR x86)
-          set(CMAKE_C_COMPILER clang)
-          set(CMAKE_CXX_COMPILER clang++)
-          set(CMAKE_C_COMPILER_TARGET i686-pc-windows-msvc)
-          set(CMAKE_CXX_COMPILER_TARGET i686-pc-windows-msvc)
-          set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-          set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-          set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-          set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
-          """
-          
-          with open(cmake_file, "w") as f:
-              f.write(toolchain_content)
-          
-          print("Toolchain clang-msvc.cmake generado correctamente.")
+          print("SDK de Geode configurado con su toolchain original intacto.")
           '
 
       - name: Configure Geode Profile
