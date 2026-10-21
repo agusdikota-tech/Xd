@@ -66,7 +66,7 @@ jobs:
         run: |
           mkdir -p /home/runner/.local/share/Geode
           export GIT_TERMINAL_PROMPT=0
-          git clone --recurse-submodules https://github.com/geode-sdk/cross-tools.git /home/runner/.local/share/Geode/cross-tools
+          git -c credential.helper= clone https://github.com/geode-sdk/cross-tools.git /home/runner/.local/share/Geode/cross-tools
 
       - name: Build Mod
         run: |
