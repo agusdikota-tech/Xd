@@ -8,5 +8,15 @@ on:
 
 jobs:
   build:
-    uses: geode-sdk/geode-actions/.github/workflows/build.yml@main
-    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Geode SDK
+        uses: geode-sdk/install-geode-cli@main
+
+      - name: Build for Android and PC
+        run: |
+          geode package build
+          
