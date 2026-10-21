@@ -64,14 +64,14 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode SDK & Cross-Tools
+      - name: Setup Geode SDK & Real Cross-Tools
         run: |
           python3 -c '
           import urllib.request, zipfile, os, shutil
           sdk_dir = "/home/runner/.local/share/Geode"
           os.makedirs(sdk_dir, exist_ok=True)
           
-          # Descargar SDK oficial
+          # 1. Descargar Geode SDK oficial
           print("Descargando Geode SDK...")
           sdk_url = "https://github.com/geode-sdk/geode/archive/refs/heads/main.zip"
           urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
@@ -80,7 +80,6 @@ jobs:
           extracted_name = [d for d in os.listdir(sdk_dir) if "geode-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
           extracted_path = os.path.join(sdk_dir, extracted_name)
           
-          # Mover contenido del SDK a la raíz de Geode
           for item in os.listdir(extracted_path):
               s = os.path.join(extracted_path, item)
               d = os.path.join(sdk_dir, item)
@@ -89,7 +88,21 @@ jobs:
                   else: os.remove(d)
               shutil.move(s, d)
           shutil.rmtree(extracted_path)
-          print("Geode SDK configurado correctamente.")
+          
+          # 2. Descargar cross-tools oficiales reales mediante ZIP (evita errores de git)
+          print("Descargando Geode Cross-Tools reales...")
+          ct_url = "https://github.com/geode-sdk/cross-tools/archive/refs/heads/main.zip"
+          urllib.request.urlretrieve(ct_url, "cross-tools.zip")
+          with zipfile.ZipFile("cross-tools.zip", "r") as z:
+              z.extractall(sdk_dir)
+          ct_extracted_name = [d for d in os.listdir(sdk_dir) if "cross-tools-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
+          ct_extracted_path = os.path.join(sdk_dir, ct_extracted_name)
+          
+          target_ct_dir = os.path.join(sdk_dir, "cross-tools")
+          if os.path.exists(target_ct_dir):
+              shutil.rmtree(target_ct_dir)
+          shutil.move(ct_extracted_path, target_ct_dir)
+          print("SDK y Cross-Tools instalados correctamente por completo.")
           '
 
       - name: Configure Geode Profile
@@ -102,10 +115,9 @@ jobs:
           data = {"sdk": "/home/runner/.local/share/Geode"}
           with open(config_file, "w") as f:
               json.dump(data, f)
-          print("Perfil de Geode configurado mediante script.")
           '
 
       - name: Build Mod
         run: |
-          geode build
+          geode build --generator Ninja
           
