@@ -24,9 +24,10 @@ jobs:
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r25c" >> $GITHUB_ENV
 
       - name: Install Geode CLI & Build
+        shell: bash
         run: |
           echo "Instalando Geode CLI..."
-          curl -sSL https://geode-sdk.org/install.sh | sh
+          curl -sSL https://geode-sdk.org/install.sh | bash
           export PATH="$HOME/.geode/bin:$PATH"
           
           # Instalar SDK y compilar
