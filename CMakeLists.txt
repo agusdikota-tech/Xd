@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+1cmake_minimum_required(VERSION 3.21)
 project(FrameAssist VERSION 0.2.0)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -10,7 +10,5 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-# Creamos la librería explícitamente usando únicamente el archivo principal
-add_library(FrameAssist SHARED src/main.cpp)
-
+# Geode se encarga de todo lo demás automáticamente con esta línea:
 setup_geode_mod(FrameAssist)
