@@ -130,5 +130,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode build --platform windows -- -G Ninja
+          geode build --platform windows -- -G Ninja -DCMAKE_MAKE_PROGRAM=ninja
           
