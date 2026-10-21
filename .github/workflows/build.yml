@@ -64,11 +64,23 @@ jobs:
 
       - name: Setup Geode Cross-Tools
         run: |
-          mkdir -p /home/runner/.local/share/Geode
-          git clone --recurse-submodules https://github.com/geode-sdk/cross-tools.git /home/runner/.local/share/Geode/cross-tools || \
-          (wget https://github.com/geode-sdk/cross-tools/archive/refs/heads/main.zip -O cross-tools.zip && \
-           unzip cross-tools.zip && \
-           mv cross-tools-main /home/runner/.local/share/Geode/cross-tools)
+          python3 -c '
+          import urllib.request, zipfile, os, shutil
+          os.makedirs("/home/runner/.local/share/Geode", exist_ok=True)
+          url = "https://github.com/geode-sdk/cross-tools/archive/refs/heads/master.zip"
+          zip_path = "cross-tools.zip"
+          print("Descargando cross-tools...")
+          urllib.request.urlretrieve(url, zip_path)
+          with zipfile.ZipFile(zip_path, "r") as z:
+              z.extractall("/home/runner/.local/share/Geode")
+          extracted_name = [d for d in os.listdir("/home/runner/.local/share/Geode") if "cross-tools" in d and d != "cross-tools"][0]
+          extracted_dir = os.path.join("/home/runner/.local/share/Geode", extracted_name)
+          target_dir = "/home/runner/.local/share/Geode/cross-tools"
+          if os.path.exists(target_dir):
+              shutil.rmtree(target_dir)
+          os.rename(extracted_dir, target_dir)
+          print("Cross-tools configuradas con éxito.")
+          '
 
       - name: Build Mod
         run: |
