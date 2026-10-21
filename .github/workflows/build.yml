@@ -36,7 +36,17 @@ jobs:
           with urllib.request.urlopen(req) as response:
               data = json.loads(response.read().decode())
           
-          download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in a["name"].lower())
+          download_url = None
+          for a in data["assets"]:
+              name = a["name"].lower()
+              if "linux" in name and ("x86_64" in name or "amd64" in name or not "arm" in name):
+                  download_url = a["browser_download_url"]
+                  break
+          
+          if not download_url:
+              download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in a["name"].lower())
+
+          print(f"Descargando CLI desde: {download_url}")
           urllib.request.urlretrieve(download_url, "geode-cli.zip")
           with zipfile.ZipFile("geode-cli.zip", "r") as z:
               z.extractall(".")
