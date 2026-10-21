@@ -16,13 +16,19 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build Geode Mod
-        uses: geode-sdk/build-geode-mod@main
+      - name: Setup Geode CLI
+        uses: geode-sdk/cli-setup@main
+
+      - name: Setup Android NDK
+        uses: nsetup/setup-ndk@v1
         with:
-          target: android32
-          configure-args: --platform android
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ndk-version: r25c
+
+      - name: Install Geode SDK & Build
+        run: |
+          geode sdk install $HOME/geode-sdk --version 5.11.2
+          geode profile add default $HOME/geode-sdk
+          geode build --platform android32 --config Release
 
       - name: Upload Mod Artifact
         uses: actions/upload-artifact@v4
