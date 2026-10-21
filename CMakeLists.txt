@@ -10,7 +10,7 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-# Declaramos la librería explícitamente para que CMake la reconozca
+# Declaramos la biblioteca vinculándola directamente al archivo principal de tu carpeta src
 add_library(FrameAssist SHARED src/main.cpp)
 
 setup_geode_mod(FrameAssist)
