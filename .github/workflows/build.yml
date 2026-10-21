@@ -28,13 +28,16 @@ jobs:
 
       - name: Install Geode CLI & Build
         run: |
-          echo "Instalando Geode CLI oficialmente..."
-          wget -qO- https://geode-sdk.org/install.sh | bash
+          echo "Instalando Geode CLI estable..."
+          mkdir -p $HOME/.geode/bin
           
-          # Asegurar que el CLI esté en el PATH de esta sesión
+          # Descargar una versión estable y directa del CLI para Linux
+          curl -L https://github.com/geode-sdk/cli/releases/download/v3.3.0/geode-cli-linux -o $HOME/.geode/bin/geode
+          
+          chmod +x $HOME/.geode/bin/geode
           export PATH="$HOME/.geode/bin:$PATH"
           
-          # Verificar instalación, instalar SDK y compilar
+          # Verificar e instalar SDK
           geode --version
           geode sdk install $HOME/geode-sdk --version 5.11.2
           geode profile add default $HOME/geode-sdk
