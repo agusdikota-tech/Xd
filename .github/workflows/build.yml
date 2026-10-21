@@ -71,7 +71,6 @@ jobs:
           sdk_dir = "/home/runner/.local/share/Geode"
           os.makedirs(sdk_dir, exist_ok=True)
           
-          # Descargar Geode SDK probando ramas (el SDK ya trae su toolchain oficial integrado)
           sdk_success = False
           for branch in ["main", "master"]:
               sdk_url = f"https://github.com/geode-sdk/geode/archive/refs/heads/{branch}.zip"
@@ -99,7 +98,7 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          print("SDK de Geode configurado con su toolchain original intacto.")
+          print("SDK de Geode configurado correctamente.")
           '
 
       - name: Configure Geode Profile
@@ -131,5 +130,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode build --platform windows
+          geode build --platform windows -- -G Ninja
           
