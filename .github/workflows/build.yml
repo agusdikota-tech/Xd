@@ -17,8 +17,8 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Ninja & Python
-        run: sudo apt-get update && sudo apt-get install -y ninja-build python3
+      - name: Setup Ninja & Python & Clang
+        run: sudo apt-get update && sudo apt-get install -y ninja-build python3 clang lld
 
       - name: Install Geode CLI
         run: |
@@ -64,7 +64,7 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode SDK & Real Cross-Tools
+      - name: Setup Geode SDK & Valid Toolchain
         run: |
           python3 -c '
           import urllib.request, zipfile, os, shutil
@@ -99,25 +99,28 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          # 2. Asegurar estructura de cross-tools de respaldo
+          # 2. Crear toolchain clang-msvc funcional para 32-bit Windows
           ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
           os.makedirs(ct_dir, exist_ok=True)
           cmake_file = os.path.join(ct_dir, "clang-msvc.cmake")
-          if not os.path.exists(cmake_file):
-              with open(cmake_file, "w") as f:
-                  f.write("# Fallback toolchain\n")
           
-          # 3. Parchear PlatformDetect.cmake para desactivar el error estricto de plataforma
-          detect_path = os.path.join(sdk_dir, "cmake", "PlatformDetect.cmake")
-          if os.path.exists(detect_path):
-              with open(detect_path, "r") as f:
-                  content = f.read()
-              content = content.replace("message(FATAL_ERROR", "# message(FATAL_ERROR")
-              with open(detect_path, "w") as f:
-                  f.write(content)
-              print("PlatformDetect.cmake parcheado para ignorar restricciones.")
-
-          print("Configuración de SDK y herramientas completada.")
+          toolchain_content = """
+          set(CMAKE_SYSTEM_NAME Windows)
+          set(CMAKE_SYSTEM_PROCESSOR x86)
+          set(CMAKE_C_COMPILER clang)
+          set(CMAKE_CXX_COMPILER clang++)
+          set(CMAKE_C_COMPILER_TARGET i686-pc-windows-msvc)
+          set(CMAKE_CXX_COMPILER_TARGET i686-pc-windows-msvc)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+          set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+          """
+          
+          with open(cmake_file, "w") as f:
+              f.write(toolchain_content)
+          
+          print("Toolchain clang-msvc.cmake generado correctamente.")
           '
 
       - name: Configure Geode Profile
@@ -143,11 +146,11 @@ jobs:
                   content = f.read()
               if "GEODE_TARGET_PLATFORM" not in content:
                   with open(cmake_path, "w") as f:
-                      f.write("set(GEODE_TARGET_PLATFORM win)\n" + content)
+                      f.write("set(GEODE_TARGET_PLATFORM win32)\n" + content)
                   print("GEODE_TARGET_PLATFORM inyectado en CMakeLists.txt")
           '
 
       - name: Build Mod
         run: |
-          geode build
+          geode build --platform win32
           
