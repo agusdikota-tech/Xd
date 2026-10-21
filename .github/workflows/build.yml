@@ -19,8 +19,7 @@ jobs:
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          cli: latest
-          platform: android
+          target: android32
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
