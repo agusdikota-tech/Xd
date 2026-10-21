@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GEODE_SDK: /home/runner/.local/share/Geode
+      GEODE_TARGET_PLATFORM: win
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -125,5 +126,5 @@ jobs:
 
       - name: Build Mod
         run: |
-          geode build --platform win
+          geode build
           
