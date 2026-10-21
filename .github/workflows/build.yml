@@ -20,6 +20,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           target: android32
+          configure-args: --platform android
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
