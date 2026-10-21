@@ -10,38 +10,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Setup Android NDK r25c
-        run: |
-          echo "Descargando NDK r25c..."
-          curl -L https://dl.google.com/android/repository/android-ndk-r25c-linux.zip -o ndk.zip
-          unzip -q ndk.zip
-          echo "ANDROID_NDK_HOME=$PWD/android-ndk-r25c" >> $GITHUB_ENV
-
-      - name: Install Geode CLI & Build
-        run: |
-          echo "Instalando Geode CLI desde GitHub..."
-          mkdir -p $HOME/.geode/bin
-          
-          # Descargar ejecutable oficial directo de GitHub Releases
-          curl -L https://github.com/geode-sdk/cli/releases/download/v3.3.0/geode-cli-linux -o $HOME/.geode/bin/geode
-          
-          chmod +x $HOME/.geode/bin/geode
-          export PATH="$HOME/.geode/bin:$PATH"
-          
-          # Verificar e instalar SDK
-          geode --version
-          geode sdk install $HOME/geode-sdk --version 5.11.2
-          geode profile add default $HOME/geode-sdk
-          geode build --platform android32 --config Release
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: android32
+          combine: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Mod Artifact
         uses: actions/upload-artifact@v4
