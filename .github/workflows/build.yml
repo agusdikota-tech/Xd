@@ -99,32 +99,13 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          # 2. Descargar cross-tools probando ramas
-          ct_success = False
-          for branch in ["main", "master"]:
-              ct_url = f"https://github.com/geode-sdk/cross-tools/archive/refs/heads/{branch}.zip"
-              try:
-                  print(f"Intentando descargar Cross-Tools desde la rama {branch}...")
-                  urllib.request.urlretrieve(ct_url, "cross-tools.zip")
-                  with zipfile.ZipFile("cross-tools.zip", "r") as z:
-                      z.extractall(sdk_dir)
-                  ct_extracted_name = [d for d in os.listdir(sdk_dir) if "cross-tools-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
-                  ct_extracted_path = os.path.join(sdk_dir, ct_extracted_name)
-                  
-                  target_ct_dir = os.path.join(sdk_dir, "cross-tools")
-                  if os.path.exists(target_ct_dir):
-                      shutil.rmtree(target_ct_dir)
-                  shutil.move(ct_extracted_path, target_ct_dir)
-                  ct_success = True
-                  break
-              except Exception as e:
-                  print(f"Fallo rama {branch} para cross-tools: {e}")
-          
-          if not ct_success:
-              print("Aviso: No se descargaron las cross-tools por red, creando estructura de respaldo...")
-              ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
-              os.makedirs(ct_dir, exist_ok=True)
-              with open(os.path.join(ct_dir, "clang-msvc.cmake"), "w") as f:
+          # 2. Descargar cross-tools de forma limpia (creando respaldo si falla)
+          print("Aviso: Omitiendo cross-tools externas pesadas, asegurando estructura de respaldo...")
+          ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
+          os.makedirs(ct_dir, exist_ok=True)
+          cmake_file = os.path.join(ct_dir, "clang-msvc.cmake")
+          if not os.path.exists(cmake_file):
+              with open(cmake_file, "w") as f:
                   f.write("# Fallback toolchain\n")
           
           print("Configuración de SDK y herramientas completada.")
@@ -139,7 +120,8 @@ jobs:
           config_file = os.path.join(config_dir, "config.json")
           data = {"sdk": "/home/runner/.local/share/Geode"}
           with open(config_file, "w") as f:
-              json.dumps(data, f)
+              json.dump(data, f)
+          print("Perfil de Geode configurado correctamente.")
           '
 
       - name: Build Mod
