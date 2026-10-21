@@ -16,16 +16,20 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Geode CLI
-        uses: geode-sdk/cli-setup@main
-
-      - name: Setup Android NDK
-        uses: nsetup/setup-ndk@v1
-        with:
-          ndk-version: r25c
-
-      - name: Install Geode SDK & Build
+      - name: Setup Android NDK r25c
         run: |
+          echo "Descargando NDK r25c..."
+          curl -L https://dl.google.com/android/repository/android-ndk-r25c-linux.zip -o ndk.zip
+          unzip -q ndk.zip
+          echo "ANDROID_NDK_HOME=$PWD/android-ndk-r25c" >> $GITHUB_ENV
+
+      - name: Install Geode CLI & Build
+        run: |
+          echo "Instalando Geode CLI..."
+          curl -sSL https://geode-sdk.org/install.sh | sh
+          export PATH="$HOME/.geode/bin:$PATH"
+          
+          # Instalar SDK y compilar
           geode sdk install $HOME/geode-sdk --version 5.11.2
           geode profile add default $HOME/geode-sdk
           geode build --platform android32 --config Release
