@@ -107,17 +107,16 @@ jobs:
           os.makedirs(config_dir, exist_ok=True)
           config_file = os.path.join(config_dir, "config.json")
           data = {
-              "profiles": [
-                  {
-                      "name": "default",
-                      "sdk": "/home/runner/.local/share/Geode"
+              "profiles": {
+                  "default": {
+                      "path": "/home/runner/.local/share/Geode"
                   }
-              ],
-              "current": "default"
+              },
+              "default-profile": "default"
           }
           with open(config_file, "w") as f:
               json.dump(data, f, indent=4)
-          print("Perfil con estructura moderna configurado correctamente.")
+          print("Estructura de perfil de Geode configurada correctamente.")
           EOF
           geode sdk install-binaries
 
