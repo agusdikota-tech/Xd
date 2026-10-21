@@ -126,6 +126,7 @@ jobs:
       - name: Inject Platform to CMakeLists
         run: |
           python3 -c '
+          import os
           cmake_path = "CMakeLists.txt"
           if os.path.exists(cmake_path):
               with open(cmake_path, "r") as f:
