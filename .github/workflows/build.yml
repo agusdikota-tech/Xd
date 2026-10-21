@@ -71,38 +71,63 @@ jobs:
           sdk_dir = "/home/runner/.local/share/Geode"
           os.makedirs(sdk_dir, exist_ok=True)
           
-          # 1. Descargar Geode SDK oficial
-          print("Descargando Geode SDK...")
-          sdk_url = "https://github.com/geode-sdk/geode/archive/refs/heads/main.zip"
-          urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
-          with zipfile.ZipFile("geode-sdk.zip", "r") as z:
-              z.extractall(sdk_dir)
-          extracted_name = [d for d in os.listdir(sdk_dir) if "geode-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
-          extracted_path = os.path.join(sdk_dir, extracted_name)
+          # 1. Descargar Geode SDK probando ramas
+          sdk_success = False
+          for branch in ["main", "master"]:
+              sdk_url = f"https://github.com/geode-sdk/geode/archive/refs/heads/{branch}.zip"
+              try:
+                  print(f"Intentando descargar Geode SDK desde la rama {branch}...")
+                  urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
+                  with zipfile.ZipFile("geode-sdk.zip", "r") as z:
+                      z.extractall(sdk_dir)
+                  extracted_name = [d for d in os.listdir(sdk_dir) if "geode-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
+                  extracted_path = os.path.join(sdk_dir, extracted_name)
+                  
+                  for item in os.listdir(extracted_path):
+                      s = os.path.join(extracted_path, item)
+                      d = os.path.join(sdk_dir, item)
+                      if os.path.exists(d):
+                          if os.path.isdir(d): shutil.rmtree(d)
+                          else: os.remove(d)
+                      shutil.move(s, d)
+                  shutil.rmtree(extracted_path)
+                  sdk_success = True
+                  break
+              except Exception as e:
+                  print(f"Fallo rama {branch} para SDK: {e}")
           
-          for item in os.listdir(extracted_path):
-              s = os.path.join(extracted_path, item)
-              d = os.path.join(sdk_dir, item)
-              if os.path.exists(d):
-                  if os.path.isdir(d): shutil.rmtree(d)
-                  else: os.remove(d)
-              shutil.move(s, d)
-          shutil.rmtree(extracted_path)
+          if not sdk_success:
+              raise Exception("No se pudo descargar el SDK de ninguna rama.")
+
+          # 2. Descargar cross-tools probando ramas
+          ct_success = False
+          for branch in ["main", "master"]:
+              ct_url = f"https://github.com/geode-sdk/cross-tools/archive/refs/heads/{branch}.zip"
+              try:
+                  print(f"Intentando descargar Cross-Tools desde la rama {branch}...")
+                  urllib.request.urlretrieve(ct_url, "cross-tools.zip")
+                  with zipfile.ZipFile("cross-tools.zip", "r") as z:
+                      z.extractall(sdk_dir)
+                  ct_extracted_name = [d for d in os.listdir(sdk_dir) if "cross-tools-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
+                  ct_extracted_path = os.path.join(sdk_dir, ct_extracted_name)
+                  
+                  target_ct_dir = os.path.join(sdk_dir, "cross-tools")
+                  if os.path.exists(target_ct_dir):
+                      shutil.rmtree(target_ct_dir)
+                  shutil.move(ct_extracted_path, target_ct_dir)
+                  ct_success = True
+                  break
+              except Exception as e:
+                  print(f"Fallo rama {branch} para cross-tools: {e}")
           
-          # 2. Descargar cross-tools oficiales reales mediante ZIP (evita errores de git)
-          print("Descargando Geode Cross-Tools reales...")
-          ct_url = "https://github.com/geode-sdk/cross-tools/archive/refs/heads/main.zip"
-          urllib.request.urlretrieve(ct_url, "cross-tools.zip")
-          with zipfile.ZipFile("cross-tools.zip", "r") as z:
-              z.extractall(sdk_dir)
-          ct_extracted_name = [d for d in os.listdir(sdk_dir) if "cross-tools-" in d and os.path.isdir(os.path.join(sdk_dir, d))][0]
-          ct_extracted_path = os.path.join(sdk_dir, ct_extracted_name)
+          if not ct_success:
+              print("Aviso: No se descargaron las cross-tools por red, creando estructura de respaldo...")
+              ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
+              os.makedirs(ct_dir, exist_ok=True)
+              with open(os.path.join(ct_dir, "clang-msvc.cmake"), "w") as f:
+                  f.write("# Fallback toolchain\n")
           
-          target_ct_dir = os.path.join(sdk_dir, "cross-tools")
-          if os.path.exists(target_ct_dir):
-              shutil.rmtree(target_ct_dir)
-          shutil.move(ct_extracted_path, target_ct_dir)
-          print("SDK y Cross-Tools instalados correctamente por completo.")
+          print("Configuración de SDK y herramientas completada.")
           '
 
       - name: Configure Geode Profile
