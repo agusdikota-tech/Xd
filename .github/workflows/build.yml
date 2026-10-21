@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GEODE_SDK: /home/runner/.local/share/Geode
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -20,12 +22,12 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Geode CLI
+      - name: Install Geode CLI & SDK
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 -c '
-          import urllib.request, json, os, stat, zipfile
+          import urllib.request, json, os, stat, zipfile, shutil
           token = os.environ.get("GH_TOKEN")
           url = "https://api.github.com/repos/geode-sdk/cli/releases/latest"
           headers = {"User-Agent": "Mozilla/5.0"}
@@ -42,11 +44,9 @@ jobs:
               if "linux" in name and ("x86_64" in name or "amd64" in name or not "arm" in name):
                   download_url = a["browser_download_url"]
                   break
-          
           if not download_url:
               download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in a["name"].lower())
 
-          print(f"Descargando CLI desde: {download_url}")
           urllib.request.urlretrieve(download_url, "geode-cli.zip")
           with zipfile.ZipFile("geode-cli.zip", "r") as z:
               z.extractall(".")
@@ -57,8 +57,42 @@ jobs:
                       os.rename(os.path.join(root, f), "geode")
                       break
           os.chmod("geode", 0o755)
+
+          # Descargar e instalar Geode SDK
+          sdk_dir = "/home/runner/.local/share/Geode"
+          os.makedirs(sdk_dir, exist_ok=True)
+          sdk_url = "https://github.com/geode-sdk/geode/archive/refs/heads/main.zip"
+          print("Descargando Geode SDK...")
+          urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
+          with zipfile.ZipFile("geode-sdk.zip", "r") as z:
+              z.extractall("sdk-temp")
+          
+          extracted_name = [d for d in os.listdir("sdk-temp") if "geode-" in d][0]
+          extracted_path = os.path.join("sdk-temp", extracted_name)
+          for item in os.listdir(extracted_path):
+              s = os.path.join(extracted_path, item)
+              d = os.path.join(sdk_dir, item)
+              if os.path.exists(d):
+                  if os.path.isdir(d): shutil.rmtree(d)
+                  else: os.remove(d)
+              shutil.move(s, d)
+          shutil.rmtree("sdk-temp")
+          print("Geode SDK instalado con éxito.")
           '
           sudo mv geode /usr/local/bin/
+
+      - name: Configure Geode Profile
+        run: |
+          python3 -c '
+          import os, json
+          config_dir = os.path.expanduser("~/.config/geode")
+          os.makedirs(config_dir, exist_ok=True)
+          config_file = os.path.join(config_dir, "config.json")
+          data = {"sdk": "/home/runner/.local/share/Geode"}
+          with open(config_file, "w") as f:
+              json.dump(data, f)
+          print("Perfil configurado.")
+          '
 
       - name: Build Mod for Android
         run: |
