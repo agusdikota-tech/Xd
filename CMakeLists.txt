@@ -10,5 +10,7 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-# Aquí es donde Geode detecta automáticamente el mod y sus fuentes sin romper Android
-setup_geode_mod(${PROJECT_NAME})
+# Creamos la librería explícitamente usando únicamente el archivo principal
+add_library(FrameAssist SHARED src/main.cpp)
+
+setup_geode_mod(FrameAssist)
