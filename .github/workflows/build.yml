@@ -20,7 +20,8 @@ jobs:
 
       - name: Install Geode CLI
         run: |
-          curl -L -o geode https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux || curl -L -o geode https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-ubuntu
+          wget https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux.zip
+          unzip geode-cli-linux.zip
           chmod +x geode
           sudo mv geode /usr/local/bin/
 
