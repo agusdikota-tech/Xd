@@ -103,17 +103,5 @@ jobs:
         run: |
           python3 -c '
           import os, json
-          config_dir = os.path.expanduser("~/.config/geode")
-          os.makedirs(config_dir, exist_ok=True)
-          config_file = os.path.join(config_dir, "config.json")
-          data = {"sdk": "/home/runner/.local/share/Geode"}
-          with open(config_file, "w") as f:
-              json.dump(data, f)
-          print("Perfil configurado.")
-          '
-          geode sdk install-binaries
-
-      - name: Build Mod for Android
-        run: |
-          geode build --platform android32
+          config_dir = os.path.expand
           
