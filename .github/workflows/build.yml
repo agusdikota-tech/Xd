@@ -1,4 +1,4 @@
-lname: Build Mod (Android)
+name: Build Mod (Android)
 
 on:
   push:
@@ -94,5 +94,34 @@ jobs:
                   mod_data = json.load(f)
               mod_data["geode"] = "v5.11.2"
               with open(mod_json_path, "w") as f:
-                  json.dump(mod_data
-                  
+                  json.dump(mod_data, f, indent=4)
+              print("mod.json actualizado a la versión de Geode compatible.")
+          EOF
+          sudo mv geode /usr/local/bin/
+
+      - name: Configure Geode Profile & Install Binaries
+        run: |
+          python3 - << 'EOF'
+          import os, json
+          config_dir = os.path.expanduser("~/.config/geode")
+          os.makedirs(config_dir, exist_ok=True)
+          config_file = os.path.join(config_dir, "config.json")
+          data = {
+              "profiles": [
+                  {
+                      "name": "default",
+                      "sdk": "/home/runner/.local/share/Geode"
+                  }
+              ],
+              "current": "default"
+          }
+          with open(config_file, "w") as f:
+              json.dump(data, f, indent=4)
+          print("Perfil con estructura moderna configurado correctamente.")
+          EOF
+          geode sdk install-binaries
+
+      - name: Build Mod for Android
+        run: |
+          geode build --platform android32
+          
