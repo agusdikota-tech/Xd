@@ -64,7 +64,7 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode SDK
+      - name: Setup Geode SDK & Toolchain File
         run: |
           python3 -c '
           import urllib.request, zipfile, os, shutil
@@ -98,7 +98,28 @@ jobs:
           if not sdk_success:
               raise Exception("No se pudo descargar el SDK de ninguna rama.")
 
-          print("SDK de Geode configurado correctamente.")
+          # Crear explícitamente el directorio y archivo clang-msvc.cmake requerido por el SDK
+          ct_dir = os.path.join(sdk_dir, "cross-tools", "clang-msvc-sdk")
+          os.makedirs(ct_dir, exist_ok=True)
+          cmake_file = os.path.join(ct_dir, "clang-msvc.cmake")
+          
+          toolchain_content = """
+          set(CMAKE_SYSTEM_NAME Windows)
+          set(CMAKE_SYSTEM_PROCESSOR x86)
+          set(CMAKE_C_COMPILER clang)
+          set(CMAKE_CXX_COMPILER clang++)
+          set(CMAKE_C_COMPILER_TARGET i686-pc-windows-msvc)
+          set(CMAKE_CXX_COMPILER_TARGET i686-pc-windows-msvc)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+          set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+          """
+          
+          with open(cmake_file, "w") as f:
+              f.write(toolchain_content)
+
+          print("SDK de Geode y toolchain configurados correctamente.")
           '
 
       - name: Configure Geode Profile
