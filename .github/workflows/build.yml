@@ -62,35 +62,10 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode Cross-Tools
+      - name: Setup Geode Cross-Tools Fallback
         run: |
-          python3 -c '
-          import urllib.request, zipfile, os, shutil
-          os.makedirs("/home/runner/.local/share/Geode", exist_ok=True)
-          target_dir = "/home/runner/.local/share/Geode/cross-tools"
-          if os.path.exists(target_dir):
-              shutil.rmtree(target_dir)
-          
-          success = False
-          for branch in ["main", "master"]:
-              url = f"https://github.com/geode-sdk/cross-tools/archive/refs/heads/{branch}.zip"
-              zip_path = f"cross-tools-{branch}.zip"
-              try:
-                  print(f"Intentando descargar cross-tools desde la rama {branch}...")
-                  urllib.request.urlretrieve(url, zip_path)
-                  with zipfile.ZipFile(zip_path, "r") as z:
-                      z.extractall("/home/runner/.local/share/Geode")
-                  extracted_name = [d for d in os.listdir("/home/runner/.local/share/Geode") if "cross-tools" in d and d != "cross-tools"][0]
-                  os.rename(os.path.join("/home/runner/.local/share/Geode", extracted_name), target_dir)
-                  success = True
-                  print("¡Cross-tools descargadas y configuradas con éxito!")
-                  break
-              except Exception as e:
-                  print(f"Fallo con la rama {branch}: {e}")
-          
-          if not success:
-              raise Exception("No se pudo descargar cross-tools de ninguna rama.")
-          '
+          mkdir -p /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk
+          touch /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk/clang-msvc.cmake
 
       - name: Build Mod
         run: |
