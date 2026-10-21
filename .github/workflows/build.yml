@@ -45,7 +45,7 @@ jobs:
                   download_url = a["browser_download_url"]
                   break
           if not download_url:
-              download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in a["name"].lower())
+              download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in name)
 
           urllib.request.urlretrieve(download_url, "geode-cli.zip")
           with zipfile.ZipFile("geode-cli.zip", "r") as z:
@@ -86,11 +86,20 @@ jobs:
               content = content.replace("message(FATAL_ERROR", "message(WARNING")
               with open(sdk_cmake, "w") as f:
                   f.write(content)
-              print("SDK parcheado para omitir error de versión de Clang.")
+
+          # Actualizar mod.json para que coincida con la versión del SDK
+          mod_json_path = "mod.json"
+          if os.path.exists(mod_json_path):
+              with open(mod_json_path, "r") as f:
+                  mod_data = json.load(f)
+              mod_data["geode"] = "v5.11.2"
+              with open(mod_json_path, "w") as f:
+                  json.dump(mod_data, f, indent=4)
+              print("mod.json actualizado a la versión de Geode compatible.")
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Configure Geode Profile
+      - name: Configure Geode Profile & Install Binaries
         run: |
           python3 -c '
           import os, json
@@ -102,6 +111,7 @@ jobs:
               json.dump(data, f)
           print("Perfil configurado.")
           '
+          geode sdk install-binaries
 
       - name: Build Mod for Android
         run: |
