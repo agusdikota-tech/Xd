@@ -28,13 +28,14 @@ jobs:
 
       - name: Install Geode CLI & Build
         run: |
-          echo "Instalando Geode CLI..."
-          mkdir -p $HOME/.geode/bin
-          curl -L https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux -o $HOME/.geode/bin/geode
-          chmod +x $HOME/.geode/bin/geode
+          echo "Instalando Geode CLI oficialmente..."
+          wget -qO- https://geode-sdk.org/install.sh | bash
+          
+          # Asegurar que el CLI esté en el PATH de esta sesión
           export PATH="$HOME/.geode/bin:$PATH"
           
-          # Instalar SDK y compilar
+          # Verificar instalación, instalar SDK y compilar
+          geode --version
           geode sdk install $HOME/geode-sdk --version 5.11.2
           geode profile add default $HOME/geode-sdk
           geode build --platform android32 --config Release
