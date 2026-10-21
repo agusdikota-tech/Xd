@@ -31,12 +31,12 @@ jobs:
         run: |
           git clone --branch v5.11.2 --depth 1 https://github.com/geode-sdk/geode.git $HOME/.local/share/Geode
 
-      - name: Download & Setup Android NDK r25c
+      - name: Download & Setup Android NDK r28
         run: |
-          echo "Descargando NDK r25c..."
-          curl -L https://dl.google.com/android/repository/android-ndk-r25c-linux.zip -o ndk.zip
+          echo "Descargando NDK r28..."
+          curl -L https://dl.google.com/android/repository/android-ndk-r28-linux.zip -o ndk.zip
           unzip -q ndk.zip
-          echo "ANDROID_NDK_HOME=$PWD/android-ndk-r25c" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$PWD/android-ndk-r28" >> $GITHUB_ENV
 
       - name: Configure CMake (${{ matrix.name }})
         run: |
