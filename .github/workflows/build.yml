@@ -20,8 +20,10 @@ jobs:
 
       - name: Install Geode CLI
         run: |
-          curl -sSL https://raw.githubusercontent.com/geode-sdk/cli/master/install.sh | bash
-          echo "$HOME/.geode/bin" >> $GITHUB_PATH
+          curl -L -o geode.tar.gz https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-linux.tar.gz || curl -L -o geode.tar.gz https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-ubuntu.tar.gz
+          tar -xzf geode.tar.gz
+          sudo chmod +x geode
+          sudo mv geode /usr/local/bin/
 
       - name: Build Mod
         run: |
