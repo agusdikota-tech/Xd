@@ -1,6 +1,9 @@
 {
     "geode": "v5.11.2",
-    "gd": "2.2.144",
+    "gd": {
+        "win": "2.2074",
+        "android": "2.2.144"
+    },
     "id": "agusdikota.frame_assist",
     "name": "Frame Assist",
     "version": "v1.0.0",
