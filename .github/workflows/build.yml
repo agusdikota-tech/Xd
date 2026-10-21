@@ -146,11 +146,11 @@ jobs:
                   content = f.read()
               if "GEODE_TARGET_PLATFORM" not in content:
                   with open(cmake_path, "w") as f:
-                      f.write("set(GEODE_TARGET_PLATFORM win32)\n" + content)
+                      f.write("set(GEODE_TARGET_PLATFORM windows)\n" + content)
                   print("GEODE_TARGET_PLATFORM inyectado en CMakeLists.txt")
           '
 
       - name: Build Mod
         run: |
-          geode build --platform win32
+          geode build --platform windows
           
