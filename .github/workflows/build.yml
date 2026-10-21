@@ -67,6 +67,10 @@ jobs:
           mkdir -p /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk
           touch /home/runner/.local/share/Geode/cross-tools/clang-msvc-sdk/clang-msvc.cmake
 
+      - name: Configure Geode SDK
+        run: |
+          geode sdk setup --non-interactive || geode config set sdk /home/runner/.local/share/Geode
+
       - name: Build Mod
         run: |
           geode build
