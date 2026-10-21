@@ -57,12 +57,14 @@ jobs:
           
           if binary_path and binary_path != "./geode":
               os.rename(binary_path, "geode")
-          elif not binary_path and not asset_name.endswith((".zip", ".tar.gz", ".tgz")):
-              os.rename(asset_name, "geode")
           
           os.chmod("geode", stat.S_IXUSR | stat.S_IRUSR | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
           '
           sudo mv geode /usr/local/bin/
+
+      - name: Setup Geode SDK
+        run: |
+          geode setup --non-interactive
 
       - name: Build Mod
         run: |
