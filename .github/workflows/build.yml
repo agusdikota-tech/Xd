@@ -103,20 +103,26 @@ jobs:
         run: |
           python3 - << 'EOF'
           import os, json
-          config_dir = os.path.expanduser("~/.config/geode")
-          os.makedirs(config_dir, exist_ok=True)
-          config_file = os.path.join(config_dir, "config.json")
-          data = {
+          config_data = {
               "default-profile": "default",
               "profiles": {
                   "default": {
-                      "path": "/home/runner/.local/share/Geode"
+                      "path": "/home/runner/.local/share/Geode",
+                      "sdk": "/home/runner/.local/share/Geode"
                   }
               }
           }
-          with open(config_file, "w") as f:
-              json.dump(data, f, indent=4)
-          print("Configuración escrita directamente sin prompts.")
+          
+          paths = [
+              os.path.expanduser("~/.config/geode/config.json"),
+              os.path.expanduser("~/.geode/config.json")
+          ]
+          
+          for config_file in paths:
+              os.makedirs(os.path.dirname(config_file), exist_ok=True)
+              with open(config_file, "w") as f:
+                  json.dump(config_data, f, indent=4)
+              print(f"Configuración escrita en: {config_file}")
           EOF
           geode sdk install-binaries
 
