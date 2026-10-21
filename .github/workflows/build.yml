@@ -62,9 +62,9 @@ jobs:
           '
           sudo mv geode /usr/local/bin/
 
-      - name: Setup Geode SDK
+      - name: Show CLI Help
         run: |
-          geode setup --non-interactive
+          geode --help
 
       - name: Build Mod
         run: |
