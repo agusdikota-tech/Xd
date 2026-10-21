@@ -9,122 +9,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      GEODE_SDK: /home/runner/.local/share/Geode
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Build Geode Mod
+        uses: geode-sdk/build-geode-mod@main
         with:
-          python-version: '3.10'
-
-      - name: Install Geode CLI & SDK
+          target: android32
+          sdk: nightly
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python3 - << 'EOF'
-          import urllib.request, json, os, stat, zipfile, shutil
-          token = os.environ.get("GH_TOKEN")
-          url = "https://api.github.com/repos/geode-sdk/cli/releases/latest"
-          headers = {"User-Agent": "Mozilla/5.0"}
-          if token:
-              headers["Authorization"] = f"Bearer {token}"
-          
-          req = urllib.request.Request(url, headers=headers)
-          with urllib.request.urlopen(req) as response:
-              data = json.loads(response.read().decode())
-          
-          download_url = None
-          for a in data["assets"]:
-              name = a["name"].lower()
-              if "linux" in name and ("x86_64" in name or "amd64" in name or not "arm" in name):
-                  download_url = a["browser_download_url"]
-                  break
-          if not download_url:
-              download_url = next(a["browser_download_url"] for a in data["assets"] if "linux" in name)
 
-          urllib.request.urlretrieve(download_url, "geode-cli.zip")
-          with zipfile.ZipFile("geode-cli.zip", "r") as z:
-              z.extractall(".")
-          
-          for root, dirs, files in os.walk("."):
-              for f in files:
-                  if f in ["geode", "geode-cli"]:
-                      os.rename(os.path.join(root, f), "geode")
-                      break
-          os.chmod("geode", 0o755)
-
-          # Descargar e instalar Geode SDK
-          sdk_dir = "/home/runner/.local/share/Geode"
-          os.makedirs(sdk_dir, exist_ok=True)
-          sdk_url = "https://github.com/geode-sdk/geode/archive/refs/heads/main.zip"
-          print("Descargando Geode SDK...")
-          urllib.request.urlretrieve(sdk_url, "geode-sdk.zip")
-          with zipfile.ZipFile("geode-sdk.zip", "r") as z:
-              z.extractall("sdk-temp")
-          
-          extracted_name = [d for d in os.listdir("sdk-temp") if "geode-" in d][0]
-          extracted_path = os.path.join("sdk-temp", extracted_name)
-          for item in os.listdir(extracted_path):
-              s = os.path.join(extracted_path, item)
-              d = os.path.join(sdk_dir, item)
-              if os.path.exists(d):
-                  if os.path.isdir(d): shutil.rmtree(d)
-                  else: os.remove(d)
-              shutil.move(s, d)
-          shutil.rmtree("sdk-temp")
-
-          # Parchear la verificación estricta de Clang en el SDK
-          sdk_cmake = os.path.join(sdk_dir, "CMakeLists.txt")
-          if os.path.exists(sdk_cmake):
-              with open(sdk_cmake, "r") as f:
-                  content = f.read()
-              content = content.replace("message(FATAL_ERROR", "message(WARNING")
-              with open(sdk_cmake, "w") as f:
-                  f.write(content)
-
-          # Actualizar mod.json para que coincida con la versión del SDK
-          mod_json_path = "mod.json"
-          if os.path.exists(mod_json_path):
-              with open(mod_json_path, "r") as f:
-                  mod_data = json.load(f)
-              mod_data["geode"] = "v5.11.2"
-              with open(mod_json_path, "w") as f:
-                  json.dump(mod_data, f, indent=4)
-              print("mod.json actualizado a la versión de Geode compatible.")
-          EOF
-          sudo mv geode /usr/local/bin/
-
-      - name: Configure Geode Profile & Install Binaries
-        run: |
-          # Crear directamente el archivo de configuración con el formato exacto que el CLI de Geode lee internamente
-          python3 - << 'EOF'
-          import os, json
-          config_path = os.path.expanduser("~/.config/geode/config.json")
-          os.makedirs(os.path.dirname(config_path), exist_ok=True)
-          
-          # Estructura validada para el CLI moderno de Geode
-          config_data = {
-              "profiles": {
-                  "default": {
-                      "path": "/home/runner/work/Xd/Xd",
-                      "sdk": "/home/runner/.local/share/Geode"
-                  }
-              },
-              "active": "default"
-          }
-          
-          with open(config_path, "w") as f:
-              json.dump(config_data, f, indent=4)
-          print("Configuración interna generada con éxito en:", config_path)
-          EOF
-          geode sdk install-binaries
-
-      - name: Build Mod for Android
-        run: |
-          geode build --platform android32
+      - name: Upload Mod Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frame-assist-android
+          path: "*.geode"
           
