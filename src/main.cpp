@@ -9,23 +9,14 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
 
-        // 1. Dibuja / Muestra el HUD personalizado de Frame Assist
-        auto statusLabel = CCLabelBMFont::create("Frame Assist: Active", "bigFont.fnt");
+        // HUD temporal de prueba para verificar que el mod inyecta bien
+        auto statusLabel = CCLabelBMFont::create("Frame Assist Active", "bigFont.fnt");
         statusLabel->setScale(0.4f);
         statusLabel->setPosition({ 80.0f, 20.0f });
         statusLabel->setID("frame-assist-hud"_spr);
         this->addChild(statusLabel, 999);
 
+        log::info("Frame Assist cargado correctamente!");
         return true;
-    }
-
-    void update(float dt) {
-        // 2. Lógica de suavizado de frames (Frame Smoothing)
-        // Normaliza el delta time para evitar micro-stutters o caídas bruscas
-        float targetFPS = 60.0f; // Ajustable según necesidad
-        float smoothDt = 1.0f / targetFPS;
-
-        // 3. Control de Ticks (Procesamiento del juego)
-        PlayLayer::update(smoothDt);
     }
 };
