@@ -1,5 +1,5 @@
 {
-  "geode": "5.11.2",
+  "geode": "4.0.0",
   "gd": {
     "win": "2.2074",
     "android": "2.2081"
@@ -8,6 +8,17 @@
   "name": "Frame Assist",
   "version": "v1.0.0",
   "developer": "agusdikota",
-  "description": "Frame Assist Mod for Geometry Dash",
-  "repository": "https://github.com/agusdikota-team/Xd"
+  "description": "Mod con suavizado de frames, gestión de ticks y HUD activo.",
+  "settings": {
+    "toggle-hud": {
+      "name": "Mostrar HUD",
+      "type": "bool",
+      "default": true
+    },
+    "smooth-frames": {
+      "name": "Suavizado de Frames",
+      "type": "bool",
+      "default": true
+    }
+  }
 }
