@@ -37,7 +37,7 @@ namespace {
 }
 
 class $modify(FAGameLayer, GJBaseGameLayer) {
-    void processCommands(float dt) {
+    void processCommands(float dt, bool isHalfTick, bool isLastTick) {
         auto pl = PlayLayer::get();
         if (pl && on() && !m_player1->m_isDead) {
             if (g_replaying) {
@@ -57,7 +57,7 @@ class $modify(FAGameLayer, GJBaseGameLayer) {
             }
             g_step++;
         }
-        GJBaseGameLayer::processCommands(dt);
+        GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
     }
 
     void handleButton(bool down, int button, bool isPlayer1) {
