@@ -28,6 +28,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Clean previous build cache
+        run: |
+          rm -rf build/ .geode/
+
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
