@@ -9,7 +9,6 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
 
-        // HUD de prueba
         auto statusLabel = CCLabelBMFont::create("Frame Assist Active", "bigFont.fnt");
         statusLabel->setScale(0.4f);
         statusLabel->setPosition({ 80.0f, 20.0f });
