@@ -21,8 +21,6 @@ jobs:
             target: Android64
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repo
@@ -43,12 +41,21 @@ jobs:
           name: frame-assist-${{ matrix.config.name }}
           path: "*.geode"
 
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            *.geode
-            **/*.geode
+          files: "**/*.geode"
           tag_name: v1.0.0
           name: Frame Assist v1.0.0
           draft: false
