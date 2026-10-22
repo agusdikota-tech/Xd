@@ -32,9 +32,9 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           target: ${{ matrix.config.target }}
+          cache: false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCCACHE_DISABLE: "1"
 
       - name: Upload Mod Artifact
         uses: actions/upload-artifact@v4
