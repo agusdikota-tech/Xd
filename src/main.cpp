@@ -9,11 +9,11 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
 
-        auto statusLabel = CCLabelBMFont::create("Frame Assist Active", "bigFont.fnt");
-        statusLabel->setScale(0.4f);
-        statusLabel->setPosition({ 80.0f, 20.0f });
-        statusLabel->setID("frame-assist-hud"_spr);
-        this->addChild(statusLabel, 999);
+        auto label = CCLabelBMFont::create("Frame Assist", "bigFont.fnt");
+        label->setScale(0.4f);
+        label->setPosition({ 80.0f, 20.0f });
+        label->setID("frame-assist-label"_spr);
+        this->addChild(label, 999);
 
         return true;
     }
