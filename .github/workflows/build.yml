@@ -28,17 +28,17 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Remove old build files and dependencies
+      - name: Force Clean Build Environment
         run: |
-          rm -rf build/
+          rm -rf build/ .geode/ CMakeCache.txt CMakeFiles/
 
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
           target: ${{ matrix.config.target }}
-          cache: false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCCACHE_DISABLE: "1"
 
       - name: Upload Mod Artifact
         uses: actions/upload-artifact@v4
