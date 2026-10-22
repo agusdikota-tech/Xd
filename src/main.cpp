@@ -9,14 +9,13 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
 
-        // HUD temporal de prueba para verificar que el mod inyecta bien
+        // HUD de prueba
         auto statusLabel = CCLabelBMFont::create("Frame Assist Active", "bigFont.fnt");
         statusLabel->setScale(0.4f);
         statusLabel->setPosition({ 80.0f, 20.0f });
         statusLabel->setID("frame-assist-hud"_spr);
         this->addChild(statusLabel, 999);
 
-        log::info("Frame Assist cargado correctamente!");
         return true;
     }
 };
