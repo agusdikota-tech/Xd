@@ -28,6 +28,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Remove old build files and dependencies
+        run: |
+          rm -rf build/
+
       - name: Build Geode Mod
         uses: geode-sdk/build-geode-mod@main
         with:
